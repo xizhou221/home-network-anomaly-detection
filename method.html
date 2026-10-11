@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>检测方法 · 口径与判据</title>
+<style>
+:root{--bg:#0e1116;--card:#161a22;--card2:#1b2029;--fg:#e7eaf1;--mut:#8b93a7;
+--line:#262c38;--acc:#4da3ff;--acc2:#57d9a3;--warn:#ffb454;--bad:#ff7a7a;}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);line-height:1.65;
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:15px}
+a{color:var(--acc);text-decoration:none}
+.wrap{max-width:920px;margin:0 auto;padding:14px 14px 60px}
+header.top{position:sticky;top:0;z-index:9;background:rgba(14,17,22,.94);
+backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+header.top .inner{max-width:920px;margin:0 auto;padding:10px 14px 8px}
+h1{font-size:18px;margin:0 0 2px}
+.sub{color:var(--mut);font-size:12.5px;margin:0}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+nav a{padding:7px 13px;border-radius:999px;background:var(--card2);
+border:1px solid var(--line);color:#cdd4e0;font-size:13.5px}
+nav a.on{background:var(--acc);border-color:var(--acc);color:#04121f;font-weight:600}
+h2{font-size:16px;margin:26px 0 10px;padding-left:9px;border-left:3px solid var(--acc)}
+h3{font-size:14.5px;margin:18px 0 8px;color:#cdd4e0}
+p{margin:8px 0}
+.note{color:var(--mut);font-size:12.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+padding:14px;margin:12px 0}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:620px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 13px}
+.kpi .v{font-size:21px;font-weight:700;letter-spacing:.2px}
+.kpi .l{color:var(--mut);font-size:12px;margin-top:3px}
+.kpi .u{color:var(--mut);font-size:11.5px;margin-top:2px}
+.dev{background:var(--card);border:1px solid var(--line);border-radius:12px;
+padding:13px 13px 6px;margin:12px 0}
+.devhead{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:2px}
+.devname{font-size:16px;font-weight:700}
+.tag{font-size:11.5px;padding:2px 8px;border-radius:999px;background:#22303f;
+color:#8fc2ff;border:1px solid #2c3d4f}
+.tag.r2{background:#2a2330;color:#d7a8ff;border-color:#3a2f42}
+.tag.r3{background:#22303a;color:#8fe0c4;border-color:#2a3d3a}
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 14px;margin:8px 0 4px;
+font-size:13px}
+@media(min-width:560px){.metrics{grid-template-columns:repeat(4,1fr)}}
+.metrics .k{color:var(--mut);font-size:11.5px}
+.metrics .v{font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600;font-size:12px}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.ev{background:var(--card2);border-radius:8px;padding:2px 10px;margin:8px 0}
+.sev{display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:999px;margin-right:7px}
+.sev.hi{background:#3a1f22;color:#ff9a9a}
+.sev.mid{background:#3a2f1d;color:#ffcb7a}
+.sev.lo{background:#1f2f3a;color:#8fd0ff}
+ul{margin:6px 0 6px 20px;padding:0}
+li{margin:3px 0}
+code{background:#20262f;padding:1px 6px;border-radius:5px;font-size:12.5px;color:#a9d5ff}
+footer{color:var(--mut);font-size:12px;margin-top:34px;border-top:1px solid var(--line);
+padding-top:12px}
+.banner{background:linear-gradient(135deg,#152033,#181a22);border:1px solid #2b3648;
+border-radius:12px;padding:14px}
+.small{font-size:12.5px;color:#aeb6c4}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<h1>检测方法 · 口径与判据</h1>
+<p class="sub">设备行为画像与异常检测 · 演示站点</p>
+<nav><a href="index.html">概览</a><a href="devices.html">设备画像</a><a href="cases.html">异常案例</a><a href="method.html" class='on'>检测方法</a></nav>
+</div></header>
+<div class="wrap">
+<p class="banner">检测口径一句话：<b>拿每台设备自己的历史当参照，在 log1p 尺度上用
+中位数与 MAD 做稳健标准化，再要求「绝对下限 ∧ 最小倍数」双条件同时满足、且多指标同向离群，
+才把它升为一类发现。</b></p><h2>检测流程</h2><div class="card"><svg viewBox="0 0 700 470" style="width:100%;height:auto" role="img" aria-label="检测流程示意图"><rect x="40" y="14" width="620" height="44" rx="8" fill="#1d2733" stroke="#3d5a7a" stroke-width="1.4"/><text x="56" y="40" fill="#dfe5ef" font-size="12.5">① 采集点：主路由镜像口（终端零安装，只旁路看，不改终端）</text><rect x="40" y="78" width="620" height="44" rx="8" fill="#1d2733" stroke="#3d5a7a" stroke-width="1.4"/><text x="56" y="104" fill="#dfe5ef" font-size="12.5">② 明细落库：连接五元组 flows（554 万行） + DNS 查询 dns_queries（239 万行）</text><rect x="40" y="142" width="620" height="44" rx="8" fill="#1d2733" stroke="#3d5a7a" stroke-width="1.4"/><text x="56" y="168" fill="#dfe5ef" font-size="12.5">③ 小时特征：每设备 × 每小时 17 维（流数/上下行字节/对端/端口/协议…）</text><rect x="40" y="206" width="620" height="44" rx="8" fill="#20303a" stroke="#3d7a6a" stroke-width="1.4"/><text x="56" y="232" fill="#dfe5ef" font-size="12.5">④ 留一基线：以该设备自身历史（剔除当前小时）为参照</text><rect x="40" y="270" width="620" height="44" rx="8" fill="#20303a" stroke="#3d7a6a" stroke-width="1.4"/><text x="56" y="296" fill="#dfe5ef" font-size="12.5">⑤ 标准化：log1p 抑制长尾 → 中位数与 MAD 稳健 z 分数</text><rect x="40" y="334" width="620" height="44" rx="8" fill="#332a1d" stroke="#7a5f3d" stroke-width="1.4"/><text x="56" y="360" fill="#dfe5ef" font-size="12.5">⑥ 双条件约束：绝对下限 ∧ 最小倍数，二者同时满足才算离群</text><rect x="40" y="398" width="620" height="44" rx="8" fill="#33202a" stroke="#7a3d52" stroke-width="1.4"/><text x="56" y="424" fill="#dfe5ef" font-size="12.5">⑦ 升档：≥2 个指标同时离群 → 升为一类发现（避免单指标误报）</text><path d="M350 58 L350 78" stroke="#4a5568" stroke-width="1.6" marker-end="url(#ah)"/><path d="M350 122 L350 142" stroke="#4a5568" stroke-width="1.6" marker-end="url(#ah)"/><path d="M350 186 L350 206" stroke="#4a5568" stroke-width="1.6" marker-end="url(#ah)"/><path d="M350 250 L350 270" stroke="#4a5568" stroke-width="1.6" marker-end="url(#ah)"/><path d="M350 314 L350 334" stroke="#4a5568" stroke-width="1.6" marker-end="url(#ah)"/><path d="M350 378 L350 398" stroke="#4a5568" stroke-width="1.6" marker-end="url(#ah)"/><defs><marker id="ah" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#4a5568"/></marker></defs><text x="40" y="462" fill="#6b7488" font-size="11">⑧ 复核：人工确认后写入 keep_windows（保留窗口），每条发现均可回库用 SQL 独立复核</text></svg></div><h2>口径要点</h2><div class="card"><ul><li><b>设备自身历史作留一基线：</b>判断某设备的某个小时时，把它自己其余小时的样本当作基线，并把被检验小时剔除（leave-one-out），避免离群值自己抬高门槛。</li><li><b>log1p 尺度：</b>流量、对端数这类指标右偏严重；先做 log1p 压缩长尾，再在变换后的空间里计算中位数与 MAD。</li><li><b>中位数 + MAD 标准化：</b>用中位数替代均值、用中位绝对偏差（MAD）替代标准差，对极端值不敏感；标准化分数 = (观测 − 中位数) / (1.4826 × MAD)。</li><li><b>观测值绝对下限：</b>光有倍数不够——基线很小的设备，任何微小波动都能做出巨大倍数。故要求观测值本身超过一个绝对门槛。</li><li><b>最小倍数约束：</b>同时要求相对留一基线达到最小倍数，两者是「与」关系，缺一不报，以此压制小基数噪声。</li><li><b>多指标同时离群才升档：</b>单个指标越界只算弱信号；当同一窗口里≥2 个指标（流数 / 上下行字节 / 对端 / 端口 / DNS 查询…）同时离群，才升为一类发现，显著降低误报。</li><li><b>每条发现可独立复核：</b>窗口写入 keep_windows 表，带规则号与说明，任何一条都能回库用 SQL 单独重算。</li></ul></div><h2>8 条规则判据（概要）</h2><div class="card"><table><tr><th>规则</th><th>判据概要</th></tr><tr><td>R-SYN-HAMMER</td><td>同一设备在窗口内持续向同一「无服务」端口发起 SYN-only 半开连接，且反向恒为 RST。</td></tr><tr><td>R-PORT-FANOUT</td><td>单个小时的外网目的端口数 / 目的地址数远超该设备自身常态（扇出爆炸）。</td></tr><tr><td>S-BYTESOUT</td><td>出向字节数在 log1p 尺度上显著高于留一基线。</td></tr><tr><td>S-BYTESIN</td><td>入向字节数在 log1p 尺度上显著高于留一基线。</td></tr><tr><td>S-FLOWS</td><td>单小时连接条数离群。</td></tr><tr><td>S-EXTPEERS</td><td>单小时外网对端数离群。</td></tr><tr><td>S-DSTPORTS</td><td>单小时目的端口数离群。</td></tr><tr><td>S-DNSQ</td><td>单小时 DNS 查询数离群（常伴随域名洪泛或异常解析）。</td></tr></table><p class="note">规则命中后仍需多指标同离群与人工复核两道关，并非单条规则即报警。</p></div><h2>6 项稳健统计（概要）</h2><div class="card"><table><tr><th>项</th><th>作用</th></tr><tr><td>中位数</td><td>中心位置的稳健估计，抗极端值。</td></tr><tr><td>MAD</td><td>离散度的稳健估计，替代标准差。</td></tr><tr><td>log1p 变换</td><td>压制右偏长尾，让小值区也分辨得出。</td></tr><tr><td>留一（leave-one-out）</td><td>基线不含被检验样本，避免自我污染。</td></tr><tr><td>分位数上限</td><td>用高分位（如 P95/P99）作经验上限交叉验证。</td></tr><tr><td>双条件门限</td><td>绝对下限 ∧ 最小倍数，压小基数噪声。</td></tr></table></div><h2>数据与隐私口径</h2><div class="card"><p>采集点在家庭主路由侧，旁路镜像，<b>终端零安装</b>；只观测网络层行为，不接触终端内部。</p><p>演示站点在构建时<b>只读</b>打开采集库（<code>mode=ro</code>），不做任何写操作；输出前对 IP、MAC、设备名与域名统一脱敏：设备改为「设备 NN」+ 角色类别，域名只保留归类后的类别与占比。</p><p class="note">设备小时特征样本共 4,378 行，覆盖 26 台设备；本页流程图为手写内联 SVG。</p></div>
+<footer>
+本页为个人毕业设计作品的脱敏演示快照 · 构建脚本 <code>demo_build.py</code>（Python 标准库，只读 SQLite）。<br>
+站点为纯静态 HTML，无任何 CDN / 外部字体 / 外部图片 / JS 框架，双击即可离线打开。<br>
+脱敏声明：本站不包含任何真实内网地址、MAC 地址、设备品牌名或原始域名；设备以「设备 NN」呈现，域名只以类别聚合呈现。
+</footer>
+</div>
+</body>
+</html>

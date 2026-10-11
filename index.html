@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>家庭网络设备行为画像与异常检测</title>
+<style>
+:root{--bg:#0e1116;--card:#161a22;--card2:#1b2029;--fg:#e7eaf1;--mut:#8b93a7;
+--line:#262c38;--acc:#4da3ff;--acc2:#57d9a3;--warn:#ffb454;--bad:#ff7a7a;}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);line-height:1.65;
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",
+"Microsoft YaHei","Noto Sans CJK SC",sans-serif;font-size:15px}
+a{color:var(--acc);text-decoration:none}
+.wrap{max-width:920px;margin:0 auto;padding:14px 14px 60px}
+header.top{position:sticky;top:0;z-index:9;background:rgba(14,17,22,.94);
+backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+header.top .inner{max-width:920px;margin:0 auto;padding:10px 14px 8px}
+h1{font-size:18px;margin:0 0 2px}
+.sub{color:var(--mut);font-size:12.5px;margin:0}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+nav a{padding:7px 13px;border-radius:999px;background:var(--card2);
+border:1px solid var(--line);color:#cdd4e0;font-size:13.5px}
+nav a.on{background:var(--acc);border-color:var(--acc);color:#04121f;font-weight:600}
+h2{font-size:16px;margin:26px 0 10px;padding-left:9px;border-left:3px solid var(--acc)}
+h3{font-size:14.5px;margin:18px 0 8px;color:#cdd4e0}
+p{margin:8px 0}
+.note{color:var(--mut);font-size:12.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+padding:14px;margin:12px 0}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:620px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 13px}
+.kpi .v{font-size:21px;font-weight:700;letter-spacing:.2px}
+.kpi .l{color:var(--mut);font-size:12px;margin-top:3px}
+.kpi .u{color:var(--mut);font-size:11.5px;margin-top:2px}
+.dev{background:var(--card);border:1px solid var(--line);border-radius:12px;
+padding:13px 13px 6px;margin:12px 0}
+.devhead{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:2px}
+.devname{font-size:16px;font-weight:700}
+.tag{font-size:11.5px;padding:2px 8px;border-radius:999px;background:#22303f;
+color:#8fc2ff;border:1px solid #2c3d4f}
+.tag.r2{background:#2a2330;color:#d7a8ff;border-color:#3a2f42}
+.tag.r3{background:#22303a;color:#8fe0c4;border-color:#2a3d3a}
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 14px;margin:8px 0 4px;
+font-size:13px}
+@media(min-width:560px){.metrics{grid-template-columns:repeat(4,1fr)}}
+.metrics .k{color:var(--mut);font-size:11.5px}
+.metrics .v{font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600;font-size:12px}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.ev{background:var(--card2);border-radius:8px;padding:2px 10px;margin:8px 0}
+.sev{display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:999px;margin-right:7px}
+.sev.hi{background:#3a1f22;color:#ff9a9a}
+.sev.mid{background:#3a2f1d;color:#ffcb7a}
+.sev.lo{background:#1f2f3a;color:#8fd0ff}
+ul{margin:6px 0 6px 20px;padding:0}
+li{margin:3px 0}
+code{background:#20262f;padding:1px 6px;border-radius:5px;font-size:12.5px;color:#a9d5ff}
+footer{color:var(--mut);font-size:12px;margin-top:34px;border-top:1px solid var(--line);
+padding-top:12px}
+.banner{background:linear-gradient(135deg,#152033,#181a22);border:1px solid #2b3648;
+border-radius:12px;padding:14px}
+.small{font-size:12.5px;color:#aeb6c4}
+</style>
+</head>
+<body>
+<header class="top"><div class="inner">
+<h1>家庭网络设备行为画像与异常检测</h1>
+<p class="sub">设备行为画像与异常检测 · 演示站点</p>
+<nav><a href="index.html" class='on'>概览</a><a href="devices.html">设备画像</a><a href="cases.html">异常案例</a><a href="method.html">检测方法</a></nav>
+</div></header>
+<div class="wrap">
+
+<p class="banner">本系统在做什么：在家庭网络的主路由侧做<b>连续全采样</b>，抓取每一个连接的
+五元组与每一条 DNS 查询，按「设备 × 小时」聚合成 17 维行为特征；再以<b>每台设备自身的历史</b>
+作为基线，用稳健统计找出偏离常态的小时，并用规则判据复核——目标是在终端零安装的前提下，
+把「设备行为画像」和「异常发现」两件事同时做出来。</p>
+<p class="small">数据来自一个真实家庭网络的连续全采样采集，已脱敏。以下所有数字均由构建脚本
+在构建时用 SQL 从采集库实取。</p><h2>采集规模</h2><div class="kpis"><div class="kpi"><div class="v">17.6 天</div><div class="l">采集周期</div><div class="u">2026-09-24 01:52 → 2026-10-11 16:01</div></div><div class="kpi"><div class="v">18 天</div><div class="l">自然日跨度</div><div class="u">2026-09-24 起至采集最新</div></div><div class="kpi"><div class="v">5,547,177</div><div class="l">连接明细总条数</div><div class="u">flows 表</div></div><div class="kpi"><div class="v">2,390,016</div><div class="l">DNS 查询总条数</div><div class="u">dns_queries 表</div></div><div class="kpi"><div class="v">15,987</div><div class="l">不同域名数</div><div class="u">去重后的 qname 数（仅统计、不展示）</div></div><div class="kpi"><div class="v">19</div><div class="l">当前在线设备数</div><div class="u">最新身份快照中的内网设备</div></div><div class="kpi"><div class="v">4,378</div><div class="l">设备小时特征样本</div><div class="u">features_hourly 行数</div></div><div class="kpi"><div class="v">47 组</div><div class="l">已检出并复核的异常案例</div><div class="u">人工复核 5 例 + 自动检出 42 组（共 145 条窗口）</div></div></div><h2>异常复核留档</h2><div class="card"><table>
+<tr><th>口径</th><th class="n">数量</th></tr>
+<tr><td>保留窗口总条数（keep_windows 行）</td><td class="n">145</td></tr>
+<tr><td>去重后的案例组（按 ref）</td><td class="n">47</td></tr>
+<tr><td>其中人工复核（manual）</td><td class="n">5</td></tr>
+<tr><td>其中自动检出（auto）</td><td class="n">140</td></tr>
+</table>
+<p class="note">每条窗口都带规则号与说明文本，可回库用 SQL 独立复核。</p></div><h2>设备构成</h2><div class="card"><svg viewBox="0 0 680 284" style="width:100%;height:auto" role="img" aria-label="横向条形图"><text x="124" y="23" fill="#c3c9d6" font-size="12" text-anchor="end">路由器</text><rect x="132" y="12" width="78.3" height="15" rx="3" fill="#4da3ff" opacity="0.85"><title>路由器 1</title></rect><text x="217.3" y="23" fill="#9aa3b5" font-size="11">1 台</text><text x="124" y="53" fill="#c3c9d6" font-size="12" text-anchor="end">无线 AP</text><rect x="132" y="42" width="78.3" height="15" rx="3" fill="#4da3ff" opacity="0.85"><title>无线 AP 1</title></rect><text x="217.3" y="53" fill="#9aa3b5" font-size="11">1 台</text><text x="124" y="83" fill="#c3c9d6" font-size="12" text-anchor="end">网络存储</text><rect x="132" y="72" width="78.3" height="15" rx="3" fill="#4da3ff" opacity="0.85"><title>网络存储 1</title></rect><text x="217.3" y="83" fill="#9aa3b5" font-size="11">1 台</text><text x="124" y="113" fill="#c3c9d6" font-size="12" text-anchor="end">桌面机</text><rect x="132" y="102" width="470.0" height="15" rx="3" fill="#4da3ff" opacity="0.85"><title>桌面机 6</title></rect><text x="609.0" y="113" fill="#9aa3b5" font-size="11">6 台</text><text x="124" y="143" fill="#c3c9d6" font-size="12" text-anchor="end">笔记本</text><rect x="132" y="132" width="156.7" height="15" rx="3" fill="#4da3ff" opacity="0.85"><title>笔记本 2</title></rect><text x="295.7" y="143" fill="#9aa3b5" font-size="11">2 台</text><text x="124" y="173" fill="#c3c9d6" font-size="12" text-anchor="end">手机</text><rect x="132" y="162" width="470.0" height="15" rx="3" fill="#4da3ff" opacity="0.85"><title>手机 6</title></rect><text x="609.0" y="173" fill="#9aa3b5" font-size="11">6 台</text><text x="124" y="203" fill="#c3c9d6" font-size="12" text-anchor="end">平板</text><rect x="132" y="192" width="156.7" height="15" rx="3" fill="#4da3ff" opacity="0.85"><title>平板 2</title></rect><text x="295.7" y="203" fill="#9aa3b5" font-size="11">2 台</text><text x="124" y="233" fill="#c3c9d6" font-size="12" text-anchor="end">智能家居</text><rect x="132" y="222" width="313.3" height="15" rx="3" fill="#4da3ff" opacity="0.85"><title>智能家居 4</title></rect><text x="452.3" y="233" fill="#9aa3b5" font-size="11">4 台</text><text x="124" y="263" fill="#c3c9d6" font-size="12" text-anchor="end">穿戴设备</text><rect x="132" y="252" width="235.0" height="15" rx="3" fill="#4da3ff" opacity="0.85"><title>穿戴设备 3</title></rect><text x="374.0" y="263" fill="#9aa3b5" font-size="11">3 台</text></svg><p class="note">按角色类别统计的在册设备数（同角色多台，见「设备画像」页逐台卡片）。</p></div><h2>每日连接数趋势</h2><div class="card"><svg viewBox="0 0 680 150" style="width:100%;height:auto" role="img" aria-label="按小时聚合柱状图"><line x1="34" y1="128.0" x2="672" y2="128.0" stroke="#2a2f3a" stroke-width="1"/><text x="29" y="131.5" fill="#6b7488" font-size="9" text-anchor="end">0</text><line x1="34" y1="69.0" x2="672" y2="69.0" stroke="#2a2f3a" stroke-width="1"/><text x="29" y="72.5" fill="#6b7488" font-size="9" text-anchor="end">206,787</text><line x1="34" y1="10.0" x2="672" y2="10.0" stroke="#2a2f3a" stroke-width="1"/><text x="29" y="13.5" fill="#6b7488" font-size="9" text-anchor="end">413,574</text><rect x="39.0" y="36.9" width="25.5" height="91.1" rx="1.2" fill="#4da3ff" opacity="0.85"><title>00:00 → 319,425</title></rect><rect x="74.4" y="28.4" width="25.5" height="99.6" rx="1.2" fill="#4da3ff" opacity="0.85"><title>01:00 → 349,112</title></rect><rect x="109.9" y="47.9" width="25.5" height="80.1" rx="1.2" fill="#4da3ff" opacity="0.85"><title>02:00 → 280,569</title></rect><rect x="145.3" y="10.0" width="25.5" height="118.0" rx="1.2" fill="#4da3ff" opacity="0.85"><title>03:00 → 413,574</title></rect><rect x="180.7" y="19.4" width="25.5" height="108.6" rx="1.2" fill="#4da3ff" opacity="0.85"><title>04:00 → 380,682</title></rect><rect x="216.2" y="28.2" width="25.5" height="99.8" rx="1.2" fill="#4da3ff" opacity="0.85"><title>05:00 → 349,739</title></rect><rect x="251.6" y="36.5" width="25.5" height="91.5" rx="1.2" fill="#4da3ff" opacity="0.85"><title>06:00 → 320,743</title></rect><rect x="287.1" y="10.8" width="25.5" height="117.2" rx="1.2" fill="#4da3ff" opacity="0.85"><title>07:00 → 410,875</title></rect><rect x="322.5" y="36.4" width="25.5" height="91.6" rx="1.2" fill="#4da3ff" opacity="0.85"><title>08:00 → 320,877</title></rect><rect x="358.0" y="23.8" width="25.5" height="104.2" rx="1.2" fill="#4da3ff" opacity="0.85"><title>09:00 → 365,223</title></rect><rect x="393.4" y="41.1" width="25.5" height="86.9" rx="1.2" fill="#4da3ff" opacity="0.85"><title>10:00 → 304,528</title></rect><rect x="428.9" y="58.4" width="25.5" height="69.6" rx="1.2" fill="#4da3ff" opacity="0.85"><title>11:00 → 243,987</title></rect><rect x="464.3" y="58.8" width="25.5" height="69.2" rx="1.2" fill="#4da3ff" opacity="0.85"><title>12:00 → 242,626</title></rect><rect x="499.7" y="51.5" width="25.5" height="76.5" rx="1.2" fill="#4da3ff" opacity="0.85"><title>13:00 → 268,156</title></rect><rect x="535.2" y="47.1" width="25.5" height="80.9" rx="1.2" fill="#4da3ff" opacity="0.85"><title>14:00 → 283,462</title></rect><rect x="570.6" y="44.7" width="25.5" height="83.3" rx="1.2" fill="#4da3ff" opacity="0.85"><title>15:00 → 291,833</title></rect><rect x="606.1" y="56.1" width="25.5" height="71.9" rx="1.2" fill="#4da3ff" opacity="0.85"><title>16:00 → 252,094</title></rect><rect x="641.5" y="114.9" width="25.5" height="13.1" rx="1.2" fill="#4da3ff" opacity="0.85"><title>17:00 → 45,918</title></rect><text x="51.7" y="143" fill="#6b7488" font-size="9" text-anchor="middle">00</text><text x="264.4" y="143" fill="#6b7488" font-size="9" text-anchor="middle">06</text><text x="477.1" y="143" fill="#6b7488" font-size="9" text-anchor="middle">12</text><text x="672" y="143" fill="#6b7488" font-size="9" text-anchor="end">23</text></svg><p class="note">横轴为采集日（共 18 天），纵轴为当日连接明细条数；首尾为不完整日。</p></div><h2>域名归类占比</h2><div class="card"><svg viewBox="0 0 680 224" style="width:100%;height:auto" role="img" aria-label="横向条形图"><text x="124" y="23" fill="#c3c9d6" font-size="12" text-anchor="end">其他</text><rect x="132" y="12" width="470.0" height="15" rx="3" fill="#57d9a3" opacity="0.85"><title>其他 1,282,483</title></rect><text x="609.0" y="23" fill="#9aa3b5" font-size="11">53.7%（11,625 个域名）</text><text x="124" y="53" fill="#c3c9d6" font-size="12" text-anchor="end">视频</text><rect x="132" y="42" width="251.0" height="15" rx="3" fill="#57d9a3" opacity="0.85"><title>视频 685,012</title></rect><text x="390.0" y="53" fill="#9aa3b5" font-size="11">28.7%（2,577 个域名）</text><text x="124" y="83" fill="#c3c9d6" font-size="12" text-anchor="end">社交</text><rect x="132" y="72" width="122.6" height="15" rx="3" fill="#57d9a3" opacity="0.85"><title>社交 334,623</title></rect><text x="261.6" y="83" fill="#9aa3b5" font-size="11">14.0%（926 个域名）</text><text x="124" y="113" fill="#c3c9d6" font-size="12" text-anchor="end">云存储</text><rect x="132" y="102" width="13.1" height="15" rx="3" fill="#57d9a3" opacity="0.85"><title>云存储 35,763</title></rect><text x="152.1" y="113" fill="#9aa3b5" font-size="11">1.5%（453 个域名）</text><text x="124" y="143" fill="#c3c9d6" font-size="12" text-anchor="end">系统更新</text><rect x="132" y="132" width="10.9" height="15" rx="3" fill="#57d9a3" opacity="0.85"><title>系统更新 29,800</title></rect><text x="149.9" y="143" fill="#9aa3b5" font-size="11">1.2%（209 个域名）</text><text x="124" y="173" fill="#c3c9d6" font-size="12" text-anchor="end">广告与统计</text><rect x="132" y="162" width="4.6" height="15" rx="3" fill="#57d9a3" opacity="0.85"><title>广告与统计 12,678</title></rect><text x="143.6" y="173" fill="#9aa3b5" font-size="11">0.5%（117 个域名）</text><text x="124" y="203" fill="#c3c9d6" font-size="12" text-anchor="end">开发者平台</text><rect x="132" y="192" width="3.6" height="15" rx="3" fill="#57d9a3" opacity="0.85"><title>开发者平台 9,706</title></rect><text x="142.6" y="203" fill="#9aa3b5" font-size="11">0.4%（80 个域名）</text></svg><table><tr><th>类别</th><th class="n">查询数</th><th class="n">占比</th><th class="n">不同域名</th></tr><tr><td>其他</td><td class="n">1,282,483</td><td class="n">53.7%</td><td class="n">11,625</td></tr><tr><td>视频</td><td class="n">685,012</td><td class="n">28.7%</td><td class="n">2,577</td></tr><tr><td>社交</td><td class="n">334,623</td><td class="n">14.0%</td><td class="n">926</td></tr><tr><td>云存储</td><td class="n">35,763</td><td class="n">1.5%</td><td class="n">453</td></tr><tr><td>系统更新</td><td class="n">29,800</td><td class="n">1.2%</td><td class="n">209</td></tr><tr><td>广告与统计</td><td class="n">12,678</td><td class="n">0.5%</td><td class="n">117</td></tr><tr><td>开发者平台</td><td class="n">9,706</td><td class="n">0.4%</td><td class="n">80</td></tr></table><p class="note">共 2,390,065 条 DNS 查询、15,987 个不同域名，按关键词规则归入以上类别；本站只展示归类结果与占比，不展示任何原始域名。</p></div><h2>三个可复核的典型案例</h2><div class="card"><span class="sev hi">高</span><b>设备 07（无线 AP）</b><p>设备 07（无线 AP）连续向本机并不提供服务的 784 端口发起半开连接，窗口内 51,493 次，占该设备同期全部连接的 74.8%</p><p class="note">详见「异常案例」页。</p></div><div class="card"><span class="sev hi">高</span><b>设备 01（手机）</b><p>设备 01（手机）在单个小时内向 11,317 个不同外网目的端口发起连接；同日（2026-09-27）上行流量峰值约 9.48 GiB、外网对端 27,055 个</p><p class="note">详见「异常案例」页。</p></div><div class="card"><span class="sev mid">中</span><b>设备 08（平板）</b><p>设备 08（平板）在凌晨 02:00 出现单小时入向流量离群，约为其自身留一基线的 2148 倍</p><p class="note">详见「异常案例」页。</p></div>
+<footer>
+本页为个人毕业设计作品的脱敏演示快照 · 构建脚本 <code>demo_build.py</code>（Python 标准库，只读 SQLite）。<br>
+站点为纯静态 HTML，无任何 CDN / 外部字体 / 外部图片 / JS 框架，双击即可离线打开。<br>
+脱敏声明：本站不包含任何真实内网地址、MAC 地址、设备品牌名或原始域名；设备以「设备 NN」呈现，域名只以类别聚合呈现。
+</footer>
+</div>
+</body>
+</html>
